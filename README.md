@@ -1,0 +1,4 @@
+KataBankOCR
+===========
+
+Kata exercise
