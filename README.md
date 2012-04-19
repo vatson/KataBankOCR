@@ -1,7 +1,7 @@
 KataBankOCR
 ===========
 
-Kata exercise
+Kata exercise [[source](http://codingdojo.org/cgi-bin/wiki.pl?KataBankOCR)]
 
 Problem Description
 -------------------
