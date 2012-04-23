@@ -8,10 +8,30 @@ namespace KataBankOCR;
  */
 class Parser
 {
-    public function parse($entry)
+    /**
+     * @param string $entries
+     */
+    public function parse($entries)
+    {
+        $result = array();
+        $lines = explode(PHP_EOL, $entries);
+        while ($entry = array_splice($lines, 0, 4)) {
+            $result[] = $this->parseEntry($entry);
+        }
+        
+        return array_filter($result);
+    }
+  
+    /**
+     * @param string $entry
+     * 
+     * @return string
+     */
+    protected function parseEntry(array $entryLines)
     {
         $explodedEntry = array();
-        foreach (explode(PHP_EOL, $entry) as $line) {
+
+        foreach ($entryLines as $line) {
             foreach (str_split($line, $length = 3) as $index => $chunk) {
                 if (false === array_key_exists($index, $explodedEntry)) {
                     $explodedEntry[$index] = $chunk;
@@ -19,7 +39,6 @@ class Parser
                     $explodedEntry[$index] .= PHP_EOL . $chunk;
                 }
             }
-
         }
 
         $parsedEntry = '';
@@ -30,8 +49,9 @@ class Parser
         }
 
         return $parsedEntry;
-    }
 
+    }
+  
     protected $dictionary = array(
 <<<PHP
  _ 
