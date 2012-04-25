@@ -21,12 +21,12 @@ class ParserTest extends \PHPUnit_Framework_TestCase
   /**
    * @test
    */
-  public function shouldReturnEmptyStringForEmptyEntry()
+  public function shouldReturnEmptyArrayForEmptyEntries()
   {
     $parser = new Parser;
     $result = $parser->parse('');
 
-    $this->assertInternalType('string', $result);
+    $this->assertInternalType('array', $result);
     $this->assertEmpty($result);
   }
 
@@ -42,6 +42,43 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($expectedResult, $result);
   }
 
+  /**
+   * @test
+   * 
+   * @dataProvider provideMultipleEntries
+   */
+  public function shouldParseMultipleEntries($entriesString, $expectedResult)
+  {
+    $parser = new Parser;
+    $result = $parser->parse($entriesString);
+    $this->assertEquals($expectedResult, $result);
+  }
+  
+  /**
+   * @return array
+   */
+  public function provideMultipleEntries()
+  {
+    return array(
+      array(
+      <<<PHP
+    _  _     _  _  _  _  _ 
+  | _| _||_||_ |_   ||_||_|
+  ||_  _|  | _||_|  ||_| _|
+                           
+ _  _  _  _  _     _  _    
+|_||_|  ||_ |_ |_| _| _|  |
+ _||_|  ||_| _|  | _||_   |
+                           
+PHP
+       , array('123456789', '987654321')
+      )
+    );
+  }
+  
+  /**
+   * @return array
+   */
   public function provideEntryString()
   {
     return array(
@@ -52,7 +89,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 |_||_||_||_||_||_||_||_||_|
                            
 PHP
-        , '000000000'
+        , array('000000000')
       ),
       array(
 <<<PHP
@@ -61,7 +98,7 @@ PHP
   |  |  |  |  |  |  |  |  |
                            
 PHP
-      , '111111111'
+      , array('111111111')
       ),
       array(
 <<<PHP
@@ -70,7 +107,7 @@ PHP
 |_ |_ |_ |_ |_ |_ |_ |_ |_ 
                            
 PHP
-      , '222222222'
+      , array('222222222')
       ),
       array(
 <<<PHP
@@ -79,7 +116,7 @@ PHP
  _| _| _| _| _| _| _| _| _|
                            
 PHP
-      , '333333333'       
+      , array('333333333')
       ),
       array(
 <<<PHP
@@ -88,7 +125,7 @@ PHP
   |  |  |  |  |  |  |  |  |
                            
 PHP
-        , '444444444'
+        , array('444444444')
         ),
         array(
 <<<PHP
@@ -97,7 +134,7 @@ PHP
  _| _| _| _| _| _| _| _| _|
                            
 PHP
-        , '555555555'
+        , array('555555555')
         ),
         array(
 <<<PHP
@@ -106,7 +143,7 @@ PHP
 |_||_||_||_||_||_||_||_||_|
                            
 PHP
-        , '666666666'
+        , array('666666666')
         ),
         array(
 <<<PHP
@@ -115,7 +152,7 @@ PHP
   |  |  |  |  |  |  |  |  |
                            
 PHP
-        , '777777777'
+        , array('777777777')
         ),
         array(
 <<<PHP
@@ -124,7 +161,7 @@ PHP
 |_||_||_||_||_||_||_||_||_|
                            
 PHP
-        , '888888888'
+        , array('888888888')
         ),
         array(
     <<<PHP
@@ -133,7 +170,7 @@ PHP
  _| _| _| _| _| _| _| _| _|
                            
 PHP
-        , '999999999'
+        , array('999999999')
         ),
         array(
 <<<PHP
@@ -142,7 +179,7 @@ PHP
   ||_  _|  | _||_|  ||_| _| 
                            
 PHP
-        , '123456789'
+        , array('123456789')
         ),
     );
   }
