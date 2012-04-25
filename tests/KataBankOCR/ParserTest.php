@@ -25,7 +25,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
   {
     $parser = new Parser;
     $result = $parser->parse('');
-
+      
     $this->assertInternalType('array', $result);
     $this->assertEmpty($result);
   }
@@ -41,7 +41,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     $result = $parser->parse($entryString);
     $this->assertEquals($expectedResult, $result);
   }
-
+    
   /**
    * @test
    * 
@@ -52,6 +52,18 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     $parser = new Parser;
     $result = $parser->parse($entriesString);
     $this->assertEquals($expectedResult, $result);
+  }
+
+  /**
+     * @test
+     *
+     * @dataProvider provideIllegibleEntries
+     */
+  public function shouldReplaceIllegibleCharWithQuestionOne($illegibleEntry, $expectedResult)
+  {
+      $parser = new Parser;
+      $result = $parser->parse($illegibleEntry);
+      $this->assertEquals($expectedResult, $result);
   }
   
   /**
@@ -176,11 +188,29 @@ PHP
 <<<PHP
     _  _     _  _  _  _  _ 
   | _| _||_||_ |_   ||_||_|
-  ||_  _|  | _||_|  ||_| _| 
+  ||_  _|  | _||_|  ||_| _|
                            
 PHP
         , array('123456789')
         ),
+    );
+  }
+
+  /**
+     * @return array
+     */
+  public function provideIllegibleEntries()
+  {
+    return array(
+      array(
+<<<PHP
+    _  _  _  _  _  _     _ 
+|_||_|| || ||_   |  |  | _ 
+  | _||_||_||_|  |  |  | _|
+                           
+PHP
+      , array('49006771?')
+      ),
     );
   }
 }

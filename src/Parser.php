@@ -13,13 +13,17 @@ class Parser
      */
     public function parse($entries)
     {
+        if (empty($entries)) {
+            return array();
+        }
+        
         $result = array();
         $lines = explode(PHP_EOL, $entries);
         while ($entry = array_splice($lines, 0, 4)) {
             $result[] = $this->parseEntry($entry);
         }
         
-        return array_filter($result);
+        return $result;
     }
   
     /**
@@ -45,6 +49,8 @@ class Parser
         foreach ($explodedEntry as $entryChar) {
             if (isset($this->dictionary[$entryChar])) {
                 $parsedEntry .= $this->dictionary[$entryChar];
+            } else {
+                $parsedEntry .= '?';
             }
         }
 
