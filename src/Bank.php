@@ -18,6 +18,15 @@ class Bank
     protected $validator;
     
     /**
+     * @var array
+     */
+    protected $statusMap = array(
+      Validator::VALID      => '',
+      Validator::INVALID    => 'ERR',
+      Validator::ILLEGIBLE  => 'ILL',
+    );
+  
+    /**
      * @param Parser $parser
      * @param Validator $validator
      */
@@ -33,6 +42,12 @@ class Bank
      */
     public function recognizeScan($scan)
     {
-        return array_filter($this->parser->parse($scan), array($this->validator, 'validate'));
+        $accounts = $this->parser->parse($scan);
+        foreach ($accounts as &$account) {
+          $status = $this->statusMap[$this->validator->validate($account)];
+          $account .= $status ? ' '.$status : '';
+        }
+
+        return $accounts;
     }
 }

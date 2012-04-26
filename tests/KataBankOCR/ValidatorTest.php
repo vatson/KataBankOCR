@@ -21,18 +21,27 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
   /**
    * @test
    */
-  public function shouldReturnTrueWhenEntryIsValid()
+  public function shouldReturnValidStatusWhenEntryIsValid()
   {
     $validator = new Validator;
-    $this->assertTrue($validator->validate('000000051'));
+    $this->assertSame(Validator::VALID, $validator->validate('000000051'));
   }
 
   /**
    * @test
    */
-  public function shouldReturnFalseWhenEntryIsInvalid()
+  public function shouldReturnInvalidStatusWhenEntryIsInvalid()
   {
     $validator = new Validator;
-    $this->assertFalse($validator->validate('000000001'));
+    $this->assertSame(Validator::INVALID, $validator->validate('000000001'));
+  }
+  
+  /**
+   * @test
+   */
+  public function shouldReturnIllegibleStatusWhenEntryHasQuestionChar()
+  {
+    $validator = new Validator;
+    $this->assertSame(Validator::ILLEGIBLE, $validator->validate('00000?000'));
   }
 }

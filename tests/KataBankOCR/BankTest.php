@@ -3,6 +3,7 @@
 namespace KataBankOCR\Tests;
 
 use KataBankOCR\Bank;
+use KataBankOCR\Validator;
 
 /**
  * @author Vadim Tyukov <brainreflex@gmail.com>
@@ -40,7 +41,7 @@ class BankTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('validate')
             ->with($validEntry)
-            ->will($this->returnValue(true))
+            ->will($this->returnValue(Validator::VALID))
         ;
         
         $bank = new Bank($parserStub, $validatorMock);
@@ -53,9 +54,10 @@ class BankTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotReturnInvalidEntries()
+    public function shouldReturnInvalidEntriesWithStatus()
     {
         $invalidEntry = '123123';
+        $invalidEntryWithStatus = $invalidEntry . ' ERR';
 
         $parserStub = $this->createParserMock();
         $parserStub
@@ -69,14 +71,41 @@ class BankTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('validate')
             ->with($invalidEntry)
-            ->will($this->returnValue(false))
+            ->will($this->returnValue(Validator::INVALID))
         ;
 
         $bank = new Bank($parserStub, $validatorMock);
 
         $result = $bank->recognizeScan('scan');
 
-        $this->assertNotContains($invalidEntry, $result);
+        $this->assertContains($invalidEntryWithStatus, $result);
+    }
+  
+    public function shouldReturnIllegibleEntriesWithStatus()
+    {
+        $illegibleEntry = '123123';
+        $illegibleEntryWithStatus = $illegibleEntry . ' ILL';
+  
+        $parserStub = $this->createParserMock();
+        $parserStub
+          ->expects($this->any())
+          ->method('parse')
+          ->will($this->returnValue(array($illegibleEntry)))
+        ;
+  
+        $validatorMock = $this->createValidatorMock();
+        $validatorMock
+          ->expects($this->once())
+          ->method('validate')
+          ->with($illegibleEntry)
+          ->will($this->returnValue(Validator::ILLEGIBLE))
+        ;
+  
+        $bank = new Bank($parserStub, $validatorMock);
+  
+        $result = $bank->recognizeScan('scan');
+  
+        $this->assertContains($illegibleEntryWithStatus, $result);
     }
     
     /**
