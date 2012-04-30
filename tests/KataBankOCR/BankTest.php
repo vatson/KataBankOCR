@@ -81,6 +81,9 @@ class BankTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($invalidEntryWithStatus, $result);
     }
   
+    /**
+     * @test
+     */
     public function shouldReturnIllegibleEntriesWithStatus()
     {
         $illegibleEntry = '123123';
@@ -106,6 +109,36 @@ class BankTest extends \PHPUnit_Framework_TestCase
         $result = $bank->recognizeScan('scan');
   
         $this->assertContains($illegibleEntryWithStatus, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCorrectlyGuessIllegibleEntryWithOneQuestionChar()
+    {
+        $illegibleEntry = '?23123';
+        $validEntry = '523123';
+        
+        $parserStub = $this->createParserMock();
+        $parserStub
+            ->expects($this->any())
+            ->method('parse')
+            ->will($this->returnValue(array($illegibleEntry)))
+        ;
+        
+        $validatorMock = $this->createValidatorMock();
+        $validatorMock
+            ->expects($this->at(0))
+            ->method('validate')
+            ->with($illegibleEntry)
+            ->will($this->returnValue(Validator::ILLEGIBLE))
+        ;
+
+        $bank = new Bank($parserStub, $validatorMock);
+
+        $result = $bank->recognizeScan('scan');
+        
+        $this->assertContains($validEntry, $result);
     }
     
     /**
