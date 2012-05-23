@@ -21,9 +21,9 @@ class Bank
      * @var array
      */
     protected $statusMap = array(
-      Validator::VALID      => '',
-      Validator::INVALID    => 'ERR',
-      Validator::ILLEGIBLE  => 'ILL',
+        Validator::VALID      => '',
+        Validator::INVALID    => ' ERR',
+        Validator::ILLEGIBLE  => ' ILL',
     );
   
     /**
@@ -44,10 +44,27 @@ class Bank
     {
         $accounts = $this->parser->parse($scan);
         foreach ($accounts as &$account) {
-          $status = $this->statusMap[$this->validator->validate($account)];
-          $account .= $status ? ' '.$status : '';
+            $status = $this->validator->validate($account);
+            if ($status == Validator::ILLEGIBLE) {
+                $account  = $this->guessIllegibleAccount($account);
+            } else {
+                $account .= $this->statusMap[$status];
+            }
         }
 
         return $accounts;
+    }
+
+    protected function guessIllegibleAccount($account)
+    {
+        $position = strpos($account, '?');
+        foreach(range(0,9) as $number) {
+            $account[$position] = $number;
+            if ($this->validator->validate($account) == Validator::VALID) {
+                return $account;
+            }
+        }
+
+        return $account . $this->statusMap[Validator::ILLEGIBLE];
     }
 }

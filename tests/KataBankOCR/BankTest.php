@@ -113,19 +113,18 @@ class BankTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @dataProvider provideIllegibleEntryWithOneQuestionChar
      */
-    public function shouldCorrectlyGuessIllegibleEntryWithOneQuestionChar()
+    public function shouldCorrectlyGuessIllegibleEntryWithOneQuestionChar($illegibleEntry, $expectedEntry)
     {
-        $illegibleEntry = '?23123';
-        $validEntry = '523123';
-        
         $parserStub = $this->createParserMock();
         $parserStub
             ->expects($this->any())
             ->method('parse')
             ->will($this->returnValue(array($illegibleEntry)))
         ;
-        
+
         $validatorMock = $this->createValidatorMock();
         $validatorMock
             ->expects($this->at(0))
@@ -138,14 +137,61 @@ class BankTest extends \PHPUnit_Framework_TestCase
 
         $result = $bank->recognizeScan('scan');
         
-        $this->assertContains($validEntry, $result);
+        $this->assertContains($expectedEntry, $result);
     }
-    
+
+    /**
+     * @test
+     */
+    public function shouldNotGuessIllegibleEntryWithMoreThanOneQuestionChar()
+    {
+        $illegibleEntry = '?2?3123';
+        $expectedEntry = '?2?3123 ILL';
+
+        $parserStub = $this->createParserMock();
+        $parserStub
+            ->expects($this->any())
+            ->method('parse')
+            ->will($this->returnValue(array($illegibleEntry)))
+        ;
+
+        $validatorMock = $this->createValidatorMock();
+        $validatorMock
+            ->expects($this->at(0))
+            ->method('validate')
+            ->with($illegibleEntry)
+            ->will($this->returnValue(Validator::ILLEGIBLE))
+        ;
+
+        $bank = new Bank($parserStub, $validatorMock);
+
+        $result = $bank->recognizeScan('scan');
+
+        $this->assertContains($expectedEntry, $result);
+    }
+
+//    /**
+//     * @test
+//     */
+//    public function shouldNotGuessIllegibleEntry()
+//    {
+//
+//    }
+
+    public function provideIllegibleEntryWithOneQuestionChar()
+    {
+        return array(
+            array('?23123', '523123'),
+            array('52?123', '523123'),
+            array('52312?', '523123'),
+        );
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|\KataBankOCR\Parser
      */
     protected function createParserMock()
-    {
+        {
         return $this->getMock('KataBankOCR\Parser');
     }
 
@@ -153,7 +199,7 @@ class BankTest extends \PHPUnit_Framework_TestCase
      * @return \PHPUnit_Framework_MockObject_MockObject|\KataBankOCR\Validator
      */
     protected function createValidatorMock()
-    {
+        {
         return $this->getMock('KataBankOCR\Validator');
     }
 }
