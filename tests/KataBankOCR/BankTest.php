@@ -86,7 +86,7 @@ class BankTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldReturnIllegibleEntriesWithStatus()
     {
-        $illegibleEntry = '123123';
+        $illegibleEntry = '123123?';
         $illegibleEntryWithStatus = $illegibleEntry . ' ILL';
   
         $parserStub = $this->createParserMock();
@@ -98,9 +98,8 @@ class BankTest extends \PHPUnit_Framework_TestCase
   
         $validatorMock = $this->createValidatorMock();
         $validatorMock
-          ->expects($this->once())
+          ->expects($this->any())
           ->method('validate')
-          ->with($illegibleEntry)
           ->will($this->returnValue(Validator::ILLEGIBLE))
         ;
   
@@ -127,10 +126,11 @@ class BankTest extends \PHPUnit_Framework_TestCase
 
         $validatorMock = $this->createValidatorMock();
         $validatorMock
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('validate')
-            ->with($illegibleEntry)
-            ->will($this->returnValue(Validator::ILLEGIBLE))
+            ->will($this->returnCallback(function($entry) use($expectedEntry) {
+                return $entry == $expectedEntry ? Validator::VALID : Validator::ILLEGIBLE;
+            }))
         ;
 
         $bank = new Bank($parserStub, $validatorMock);

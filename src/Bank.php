@@ -44,6 +44,9 @@ class Bank
     {
         $accounts = $this->parser->parse($scan);
         foreach ($accounts as &$account) {
+            //BC
+            $account = (string) $account;
+            
             $status = $this->validator->validate($account);
             if ($status == Validator::ILLEGIBLE) {
                 $account  = $this->guessIllegibleAccount($account);
@@ -57,11 +60,13 @@ class Bank
 
     protected function guessIllegibleAccount($account)
     {
+        $modifiedAccount = $account;
+        
         $position = strpos($account, '?');
         foreach(range(0,9) as $number) {
-            $account[$position] = $number;
-            if ($this->validator->validate($account) == Validator::VALID) {
-                return $account;
+            $modifiedAccount[$position] = $number;
+            if ($this->validator->validate($modifiedAccount) == Validator::VALID) {
+                return $modifiedAccount;
             }
         }
 

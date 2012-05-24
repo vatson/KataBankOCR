@@ -2,6 +2,8 @@
 
 namespace KataBankOCR;
 
+use KataBankOCR\ParsedEntry;
+
 /**
  * @author Vadim Tyukov <brainreflex@gmail.com>
  * @since 4/19/12
@@ -29,7 +31,7 @@ class Parser
     /**
      * @param string $entry
      * 
-     * @return string
+     * @return \KataBankOCR\ParsedEntry
      */
     protected function parseEntry(array $entryLines)
     {
@@ -44,13 +46,14 @@ class Parser
                 }
             }
         }
-
-        $parsedEntry = '';
-        foreach ($explodedEntry as $entryChar) {
+    
+        $parsedEntry = new ParsedEntry();
+        foreach ($explodedEntry as $index => $entryChar) {
+            $parsedEntry->setSourceChar($index, $entryChar);
             if (isset($this->dictionary[$entryChar])) {
-                $parsedEntry .= $this->dictionary[$entryChar];
+                $parsedEntry->setParsedChar($index, $this->dictionary[$entryChar]);
             } else {
-                $parsedEntry .= '?';
+                $parsedEntry->setParsedChar($index, '?');
             }
         }
 
