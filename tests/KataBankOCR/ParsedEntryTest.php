@@ -76,7 +76,7 @@ class ParsedEntryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function couldBeConvertedToStringAsStringOfParsedChars()
+    public function shouldConvertToString()
     {
         $expectedParsedEntry = '125';
         
@@ -87,5 +87,45 @@ class ParsedEntryTest extends \PHPUnit_Framework_TestCase
         $entry->setParsedChar($index = 5, $parsedChar = 5);
         
         $this->assertEquals($expectedParsedEntry, (string) $entry);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowSetStatus()
+    {
+        $entry = new ParsedEntry();
+
+        $entry->setStatus('a_status');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowGetPreviouslySetStatus()
+    {
+        $expectedStatus = 'the_status';
+        
+        $entry = new ParsedEntry();
+
+        $entry->setStatus($expectedStatus);
+        
+        $this->assertEquals($expectedStatus, $entry->getStatus());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldConvertToStringWithStatusAtTheEnd()
+    {
+        $expectedEntryString = '15 the_status';
+        
+        $entry = new ParsedEntry();
+
+        $entry->setStatus('the_status');
+        $entry->setParsedChar(0, '1');
+        $entry->setParsedChar(1, '5');
+
+        $this->assertEquals($expectedEntryString, (string) $entry);
     }
 }

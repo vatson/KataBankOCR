@@ -16,6 +16,11 @@ class ParsedEntry
      * @var array
      */
     protected $parsedChars = array();
+
+    /**
+     * @var string
+     */
+    protected $status;
     
     /**
      * @param string $index
@@ -54,12 +59,33 @@ class ParsedEntry
     {
         return $this->parsedChars[$index];
     }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
     
     /**
      * @return string
      */
     public function __toString()
     {
-        return implode('', $this->parsedChars);
+        $entryString = implode('', $this->parsedChars);
+        if ($this->status) {
+            $entryString .= " {$this->status}";
+        }
+        
+        return $entryString;
     }
 }
