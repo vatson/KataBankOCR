@@ -10,38 +10,60 @@ use KataBankOCR\Validator;
  */
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
-  /**
-   * @test
-   */
-  public function couldBeConstructedWithoutArgs()
-  {
-    new Validator;
-  }
+    /**
+     * @test
+     */
+    public function couldBeConstructedWithoutArgs()
+    {
+        new Validator;
+    }
 
-  /**
-   * @test
-   */
-  public function shouldReturnValidStatusWhenEntryIsValid()
-  {
-    $validator = new Validator;
-    $this->assertSame(Validator::VALID, $validator->validate('000000051'));
-  }
+    /**
+     * @test
+     */
+    public function shouldReturnValidStatusWhenEntryIsValid()
+    {
+        $validator = new Validator;
+        $this->assertSame(Validator::VALID, $validator->validate('000000051'));
+    }
 
-  /**
-   * @test
-   */
-  public function shouldReturnInvalidStatusWhenEntryIsInvalid()
-  {
-    $validator = new Validator;
-    $this->assertSame(Validator::INVALID, $validator->validate('000000001'));
-  }
-  
-  /**
-   * @test
-   */
-  public function shouldReturnIllegibleStatusWhenEntryHasQuestionChar()
-  {
-    $validator = new Validator;
-    $this->assertSame(Validator::ILLEGIBLE, $validator->validate('00000?000'));
-  }
+    /**
+     * @test
+     */
+    public function shouldReturnInvalidStatusWhenEntryIsInvalid()
+    {
+        $validator = new Validator;
+        $this->assertSame(Validator::INVALID, $validator->validate('000000001'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnIllegibleStatusWhenEntryHasQuestionChar()
+    {
+        $validator = new Validator;
+        $this->assertSame(Validator::ILLEGIBLE, $validator->validate('00000?000'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAcceptParsedEntryAsArguments()
+    {
+        $validEntry = '000000051';
+        
+        $validator = new Validator;
+        
+        //guard
+        $this->assertSame(Validator::VALID, $validator->validate($validEntry));
+        
+        $parsedEntry = $this->getMock('KataBankOCR\ParsedEntry', array('__toString'));
+        $parsedEntry
+            ->expects($this->any())
+            ->method('__toString')
+            ->will($this->returnValue($validEntry))
+        ;
+
+        $this->assertSame(Validator::VALID, $validator->validate($parsedEntry));
+    }
 }
